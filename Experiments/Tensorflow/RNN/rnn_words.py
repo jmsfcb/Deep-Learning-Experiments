@@ -66,8 +66,8 @@ n_input = 3
 n_hidden = 512
 
 # tf Graph input
-x = tf.placeholder("float", [None, n_input, 1])
-y = tf.placeholder("float", [None, vocab_size])
+x = tf.placeholder("float", [None, n_input, 1], name="x1")
+y = tf.placeholder("float", [None, vocab_size], name="x2")
 
 # RNN output node weights and biases
 weights = {
@@ -163,11 +163,12 @@ with tf.Session() as session:
     print("Run on command line.")
     print("\ttensorboard --logdir=%s" % (logs_path))
     print("Point your web browser to: http://localhost:6006/")
+
     saver.save(session, './data/my_test_model')
-    
+
     while True:
         prompt = "%s words: " % n_input
-        sentence = raw_input(prompt)
+        sentence = input(prompt)
         sentence = sentence.strip()
         words = sentence.split(' ')
         if len(words) != n_input:
