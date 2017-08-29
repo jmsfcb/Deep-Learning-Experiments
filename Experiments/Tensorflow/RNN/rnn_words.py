@@ -88,26 +88,27 @@ def RNN(x, weights, biases):
 
     # 2-layer LSTM, each layer has n_hidden units.
     # Average Accuracy= 95.20% at 50k iter
-    rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(n_hidden),rnn.BasicLSTMCell(n_hidden)])
+    # rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(n_hidden),rnn.BasicLSTMCell(n_hidden)])
 
     # 1-layer LSTM with n_hidden units but with lower accuracy.
     # Average Accuracy= 90.60% 50k iter
     # Uncomment line below to test but comment out the 2-layer rnn.MultiRNNCell above
-    # rnn_cell = rnn.BasicLSTMCell(n_hidden)
-
+    #rnn_cell = rnn.BasicLSTMCell(n_hidden, forget_bias=0.0, state_is_tuple=True,reuse=tf.get_variable_scope().reuse)
+    rnn_cell = rnn.LSTMCell(n_hidden, forget_bias=0.0)
+    
     # generate prediction
     outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
 
     # there are n_input outputs but
     # we only want the last output
-    return tf.matmul(outputs[-1], weights['out']) + biases['out']
+    return tf.add(tf.matmul(outputs[-1], weights['out']), biases['out'], "network_out")
 
 pred = RNN(x, weights, biases)
 
 # Loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, labels=y))
-optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate).minimize(cost)
-
+optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate, name="opt_rms").minimize(cost)
+#optimizer = tf.train.AdamOptimizer().minimize(cost)
 # Model evaluation
 correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
@@ -165,7 +166,11 @@ with tf.Session() as session:
     print("Point your web browser to: http://localhost:6006/")
 
     saver.save(session, './data/my_test_model')
-
+    
+    # my_graph = tf.get_default_graph()
+    # for i in my_graph.get_operations():
+    #     print (i)
+    
     while True:
         prompt = "%s words: " % n_input
         sentence = input(prompt)
