@@ -66,8 +66,8 @@ n_input = 3
 n_hidden = 512
 
 # tf Graph input
-x = tf.placeholder("float", [None, n_input, 1])
-y = tf.placeholder("float", [None, vocab_size])
+x = tf.placeholder("float", [None, n_input, 1], name="x1")
+y = tf.placeholder("float", [None, vocab_size], name="x2")
 
 # RNN output node weights and biases
 weights = {
@@ -124,16 +124,16 @@ with tf.Session() as session:
     new_saver.restore(session, tf.train.latest_checkpoint('./data/'))
     graph = tf.get_default_graph()
     # # tf Graph input
-    # x = graph.get_tensor_by_name("x1:0")
-    # y = graph.get_tensor_by_name("x2:0")
+    x = graph.get_tensor_by_name("x1:0")
+    y = graph.get_tensor_by_name("x2:0")
 
-    # # RNN output node weights and biases
-    # weights = {
-    #     'out': graph.get_tensor_by_name("w1:0")
-    # }
-    # biases = {
-    #     'out': graph.get_tensor_by_name("b1:0")
-    # }
+    # RNN output node weights and biases
+    weights = {
+        'out': graph.get_tensor_by_name("w1:0")
+    }
+    biases = {
+        'out': graph.get_tensor_by_name("b1:0")
+    }
     step = 0
     offset = random.randint(0,n_input+1)
     end_offset = n_input + 1
