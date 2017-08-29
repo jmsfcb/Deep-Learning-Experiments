@@ -144,7 +144,7 @@ with tf.Session() as session:
     #     print (i)
     for i in tf.global_variables():
       print(i)
-    session.run(tf.global_variables())
+    #session.run(tf.global_variables())
     session.run(init)
     for i in tf.global_variables():
       print(i)
